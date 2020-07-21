@@ -23,7 +23,7 @@ export default new Vuex.Store({
   actions: {
     signUp({ commit, dispatch }, authData) {
       axios
-        .post("/accounts:signUp?key=AIzaSyD17ETHr7pXldHU3rveESWADlzidhTUhVk", {
+        .post("/accounts:signUp?key=[API_KEY]", {
           email: authData.email,
           password: authData.password,
           returnSecureToken: true
@@ -40,7 +40,7 @@ export default new Vuex.Store({
     signIn({ commit }, authData) {
       axios
         .post(
-          "/accounts:signInWithPassword?key=AIzaSyD17ETHr7pXldHU3rveESWADlzidhTUhVk",
+          "/accounts:signInWithPassword?key=[API_KEY]",
           {
             email: authData.email,
             password: authData.password,
