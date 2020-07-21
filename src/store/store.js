@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "../axios-auth";
 import globalAxios from "axios";
+import router from "../router/router";
 
 Vue.use(Vuex);
 
@@ -18,12 +19,16 @@ export default new Vuex.Store({
     },
     storeUser(state, user) {
       state.user = user;
+    },
+    clearAuthData(state) {
+      state.idToken = null;
+      state.userId = null;
     }
   },
   actions: {
     signUp({ commit, dispatch }, authData) {
       axios
-        .post("/accounts:signUp?key=[API_KEY]", {
+        .post("/accounts:signUp?key=AIzaSyD17ETHr7pXldHU3rveESWADlzidhTUhVk", {
           email: authData.email,
           password: authData.password,
           returnSecureToken: true
@@ -36,11 +41,12 @@ export default new Vuex.Store({
           });
           dispatch("storeUser", authData);
         });
+      router.replace("/dashboard");
     },
     signIn({ commit }, authData) {
       axios
         .post(
-          "/accounts:signInWithPassword?key=[API_KEY]",
+          "/accounts:signInWithPassword?key=AIzaSyD17ETHr7pXldHU3rveESWADlzidhTUhVk",
           {
             email: authData.email,
             password: authData.password,
@@ -79,8 +85,13 @@ export default new Vuex.Store({
         console.log(users);
         commit("storeUser", users[0]);
       });
+    },
+    logout({ commit }) {
+      commit("clearAuthData");
+      router.replace("/signin");
     }
   },
+
   getters: {
     user(state) {
       return state.user;
