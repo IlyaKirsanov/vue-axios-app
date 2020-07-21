@@ -5,8 +5,8 @@ import router from "./router/router";
 import store from "./store/store";
 
 axios.defaults.baseURL = "https://vue-axios-test-bb762.firebaseio.com";
-axios.defaults.headers.common["Authorization"] = "12312user";
-axios.defaults.headers.get["Accept"] = "application/json";
+//axios.defaults.headers.common["Authorization"] = "12312user";
+//axios.defaults.headers.get["Accept"] = "application/json";
 
 const reqInterceptor = axios.interceptors.request.use(config => {
   console.log(config);

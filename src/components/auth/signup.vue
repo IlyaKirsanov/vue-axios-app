@@ -101,9 +101,15 @@ export default {
         terms: this.terms
       };
       console.log(formData);
-      axios.post("/users.json", formData).then(response => {
-        console.log(response);
-      });
+      axios
+        .post("/accounts:signUp?key=AIzaSyD17ETHr7pXldHU3rveESWADlzidhTUhVk", {
+          email: formData.email,
+          password: formData.password,
+          returnSecureToken: true
+        })
+        .then(response => {
+          console.log(response);
+        });
     }
   }
 };
