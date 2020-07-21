@@ -5,6 +5,5 @@ const instace = axios.create({
 
 });
 
-//instace.defaults.headers.common['SOMETHING'] = 'something'
 
 export default instace;
