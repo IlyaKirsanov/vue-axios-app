@@ -26,6 +26,11 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    setLogoutTimer({ commit }, expirationTime) {
+      setTimeout(() => {
+        commit("clearAuthData");
+      }, expirationTime);
+    },
     signUp({ commit, dispatch }, authData) {
       axios
         .post("/accounts:signUp?key=AIzaSyD17ETHr7pXldHU3rveESWADlzidhTUhVk", {
@@ -39,11 +44,35 @@ export default new Vuex.Store({
             token: response.data.idToken,
             userId: response.data.localId
           });
+          const now = new Date();
+          const expirationDate = new Date(
+            now.getTime() + response.data.expiresIn * 1000
+          );
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("userId", response.data.localId);
+          localStorage.setItem("expirationDate", expirationDate);
           dispatch("storeUser", authData);
+          dispatch("setLogoutTimer", response.data.expiresIn);
         });
       router.replace("/dashboard");
     },
-    signIn({ commit }, authData) {
+    tryAutoLogin({ commit }) {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+      const expirationDate = localStorage.getItem("expirationDate");
+      const now = new Date();
+      if (now >= expirationDate) {
+        return;
+      }
+      const userId = localStorage.getItem("userId");
+      commit("authUser", {
+        token: token,
+        userId: userId
+      });
+    },
+    signIn({ commit, dispatch }, authData) {
       axios
         .post(
           "/accounts:signInWithPassword?key=AIzaSyD17ETHr7pXldHU3rveESWADlzidhTUhVk",
@@ -59,6 +88,14 @@ export default new Vuex.Store({
             token: response.data.idToken,
             userId: response.data.localId
           });
+          const now = new Date();
+          const expirationDate = new Date(
+            now.getTime() + response.data.expiresIn * 1000
+          );
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("userId", response.data.localId);
+          localStorage.setItem("expirationDate", expirationDate);
+          dispatch("setLogoutTimer", response.data.expiresIn);
         });
     },
     storeUser({ state }, userData) {
@@ -88,6 +125,9 @@ export default new Vuex.Store({
     },
     logout({ commit }) {
       commit("clearAuthData");
+      localStorage.removeItem("expirationDate");
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
       router.replace("/signin");
     }
   },
