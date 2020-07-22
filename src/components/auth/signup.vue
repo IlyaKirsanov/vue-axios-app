@@ -1,4 +1,4 @@
-import { required } from 'vuelidate/lib/validators';
+import { required, minLength } from 'vuelidate/lib/validators';
 <template>
   <div id="signup">
     <div class="signup-form">
@@ -58,6 +58,7 @@ import { required } from 'vuelidate/lib/validators';
           <button @click="onAddHobby" type="button">Add Hobby</button>
           <div class="hobby-list">
             <div
+              :class="{ invalid: $v.hobbyInputs.$each[index].$error }"
               class="input"
               v-for="(hobbyInput, index) in hobbyInputs"
               :key="hobbyInput.id"
@@ -67,11 +68,13 @@ import { required } from 'vuelidate/lib/validators';
                 type="text"
                 :id="hobbyInput.id"
                 v-model="hobbyInput.value"
+                @blur="$v.hobbyInputs.$each[index].value.$touch()"
               />
               <button @click="onDeleteHobby(hobbyInput.id)" type="button">
                 X
               </button>
             </div>
+            <p v-if="!$v.hobbyInputs.minLen">You have to specify at least {{ $v.hobbyInputs.$params.minLen.min }} hobbies</p>
           </div>
         </div>
         <div class="input inline" :class="{ invalid: $v.terms.$invalid }">
@@ -134,6 +137,16 @@ export default {
       required: requiredUnless(vm => {
         return vm.country === "germany";
       })
+    },
+    hobbyInputs:{
+      required,
+      minLen: minLength(2),
+      $each: {
+        value: {
+          required,
+          minLen: minLength(5)
+        }
+      }
     }
   },
   methods: {
