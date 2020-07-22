@@ -74,7 +74,10 @@ import { required, minLength } from 'vuelidate/lib/validators';
                 X
               </button>
             </div>
-            <p v-if="!$v.hobbyInputs.minLen">You have to specify at least {{ $v.hobbyInputs.$params.minLen.min }} hobbies</p>
+            <p v-if="!$v.hobbyInputs.minLen">
+              You have to specify at least
+              {{ $v.hobbyInputs.$params.minLen.min }} hobbies
+            </p>
           </div>
         </div>
         <div class="input inline" :class="{ invalid: $v.terms.$invalid }">
@@ -87,7 +90,7 @@ import { required, minLength } from 'vuelidate/lib/validators';
           <label for="terms">Accept Terms of Use</label>
         </div>
         <div class="submit">
-          <button type="submit">Submit</button>
+          <button type="submit" :disabled="$v.$invalid">Submit</button>
         </div>
       </form>
     </div>
@@ -104,6 +107,7 @@ import {
   sameAs,
   requiredUnless
 } from "vuelidate/lib/validators";
+import axios from "axios";
 export default {
   data() {
     return {
@@ -119,7 +123,16 @@ export default {
   validations: {
     email: {
       required,
-      email
+      email,
+      unique: function(value) {
+        if (value === "") return true;
+        return axios
+          .get('/users.json?orderBy="email"&equalTo="' + value + '"')
+          .then(response => {
+            console.log(response);
+            return Object.keys(response.data).length===0;
+          });
+      }
     },
     age: {
       required,
@@ -138,7 +151,7 @@ export default {
         return vm.country === "germany";
       })
     },
-    hobbyInputs:{
+    hobbyInputs: {
       required,
       minLen: minLength(2),
       $each: {
