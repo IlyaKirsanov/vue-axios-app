@@ -1,3 +1,4 @@
+import { required } from 'vuelidate/lib/validators';
 <template>
   <div id="signup">
     <div class="signup-form">
@@ -73,8 +74,13 @@
             </div>
           </div>
         </div>
-        <div class="input inline">
-          <input type="checkbox" id="terms" v-model="terms" />
+        <div class="input inline" :class="{ invalid: $v.terms.$invalid }">
+          <input
+            @change="$v.terms.$touch()"
+            type="checkbox"
+            id="terms"
+            v-model="terms"
+          />
           <label for="terms">Accept Terms of Use</label>
         </div>
         <div class="submit">
@@ -92,7 +98,8 @@ import {
   numeric,
   minValue,
   minLength,
-  sameAs
+  sameAs,
+  requiredUnless
 } from "vuelidate/lib/validators";
 export default {
   data() {
@@ -122,6 +129,11 @@ export default {
     },
     confirmPassword: {
       sameAs: sameAs("password")
+    },
+    terms: {
+      required: requiredUnless(vm => {
+        return vm.country === "germany";
+      })
     }
   },
   methods: {
