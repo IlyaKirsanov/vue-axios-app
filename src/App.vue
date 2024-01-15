@@ -14,6 +14,7 @@ export default {
   },
   created() {
     this.$store.dispatch("tryAutoLogin");
+    console.log('Hello world');
   }
 };
 </script>
